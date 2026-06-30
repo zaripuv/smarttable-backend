@@ -1,0 +1,27 @@
+{
+  "name": "smarttable-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SmartTable - Multi-tenant SaaS Restaurant QR Ordering Platform Backend",
+  "license": "MIT",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "prettier --write \"apps/**/*.ts\" \"packages/**/*.ts\"",
+    "db:generate": "pnpm --filter @smarttable/api db:generate",
+    "db:migrate": "pnpm --filter @smarttable/api db:migrate",
+    "db:seed": "pnpm --filter @smarttable/api db:seed",
+    "db:studio": "pnpm --filter @smarttable/api db:studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "prettier": "^3.4.2"
+  },
+  "packageManager": "pnpm@9.15.1",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
