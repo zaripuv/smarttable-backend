@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: deps
+    container_name: smarttable-api-dev
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://smarttable:smarttable@postgres:5432/smarttable
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=dev-secret-key
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - SWAGGER_ENABLED=true
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - ./apps/api/prisma:/app/apps/api/prisma
+    command: pnpm --filter @smarttable/api dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - smarttable-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: smarttable-postgres-dev
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: smarttable
+      POSTGRES_PASSWORD: smarttable
+      POSTGRES_DB: smarttable
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U smarttable']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smarttable-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: smarttable-redis-dev
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smarttable-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: smarttable-minio-dev
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-dev-data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - smarttable-network
+
+volumes:
+  postgres-dev-data:
+  minio-dev-data:
+
+networks:
+  smarttable-network:
+    driver: bridge
