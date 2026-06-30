@@ -25,6 +25,8 @@ describe('OrdersService', () => {
 
   const mockRealtimeGateway = {
     emitToRestaurant: jest.fn(),
+    emitNewOrder: jest.fn(),
+    emitOrderStatusChange: jest.fn(),
   };
 
   const mockMetricsService = {
@@ -118,7 +120,7 @@ describe('OrdersService', () => {
       const result = await service.updateStatus(1, { status: 'ACCEPTED' as any }, 1);
 
       expect(result.status).toBe('ACCEPTED');
-      expect(mockRealtimeGateway.emitToRestaurant).toHaveBeenCalled();
+      expect(mockRealtimeGateway.emitOrderStatusChange).toHaveBeenCalled();
       expect(mockMetricsService.recordOrder).toHaveBeenCalled();
     });
   });
