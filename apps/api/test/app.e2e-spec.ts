@@ -61,11 +61,15 @@ describe('SmartTable API (e2e)', () => {
         .post('/api/v1/auth/register')
         .send(testUser)
         .expect(201)
-        .expect((res: { body: { data: { accessToken: string; refreshToken: string; user: { email: string } } } }) => {
-          expect(res.body.data).toHaveProperty('accessToken');
-          expect(res.body.data).toHaveProperty('refreshToken');
-          expect(res.body.data.user).toHaveProperty('email', testUser.email);
-        });
+        .expect(
+          (res: {
+            body: { data: { accessToken: string; refreshToken: string; user: { email: string } } };
+          }) => {
+            expect(res.body.data).toHaveProperty('accessToken');
+            expect(res.body.data).toHaveProperty('refreshToken');
+            expect(res.body.data.user).toHaveProperty('email', testUser.email);
+          },
+        );
     });
 
     it('/auth/login (POST) - should login with valid credentials', () => {
